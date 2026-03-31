@@ -14,6 +14,7 @@ import com.atechproc.repository.MedicineRepository;
 import com.atechproc.service.medicine.IMedicineService;
 import com.atechproc.service.pharmacy.IPharmacyService;
 import com.atechproc.service.user.IUserService;
+import com.atechproc.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,26 +29,13 @@ public class CartService implements ICartService {
     private final IMedicineService medicineService;
     private final IPharmacyService pharmacyService;
     private final MedicineRepository medicineRepository;
-    private final IUserService userService;
+//    private final IUserService userService;
+    private final Utils utils;
 
     @Override
     public CartDto addItemToCart(Long medicineId, String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         Medicine medicine = medicineService.getMedicineById(medicineId);
 
@@ -97,20 +85,7 @@ public class CartService implements ICartService {
     public CartItemDto updateCartItemQuantity(Long id, int quantity, String jwt)
             throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         if (quantity == 0) {
             removeItemFromCart(id, jwt);
@@ -171,22 +146,9 @@ public class CartService implements ICartService {
     @Override
     public CartDto removeItemFromCart(Long id, String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
-
-        Cart cart = getPharmacyCart(jwt);
+        Cart cart = pharmacy.getCart();
         CartItem item = getCartItemById(id);
         if (!cart.getItems().contains(item)) {
             throw new Exception("You are not allowed to remove this item from the cart");
@@ -214,20 +176,7 @@ public class CartService implements ICartService {
     @Override
     public void cancelCart(String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         Cart cart = pharmacy.getCart();
 
@@ -248,20 +197,7 @@ public class CartService implements ICartService {
     @Override
     public void clearCart(String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         Cart cart = pharmacy.getCart();
 

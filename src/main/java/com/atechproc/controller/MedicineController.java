@@ -206,4 +206,38 @@ public class MedicineController {
         List<MedicineDto> medicines = medicineService.searchForExpiredMedicinesByName(jwt, keyword);
         return ResponseEntity.ok(new ApiResponse("Success", medicines));
     }
+
+    @GetMapping("/search/name-batch-number")
+    public ResponseEntity<ApiResponse> searchForMedicineByNameAndBatchNumber(
+            @RequestHeader("Authorization") String jwt,
+            @RequestParam String name,
+            @RequestParam String batchNumber
+    ) throws Exception {
+        List<MedicineDto> medicines = medicineService.searchForMedicinesByNameAndBatchNumber(jwt, name, batchNumber);
+        return ResponseEntity.ok(new ApiResponse("Success", medicines));
+    }
+
+    @GetMapping("/inStock")
+    public ResponseEntity<ApiResponse> getInStockMedicines(
+            @RequestHeader("Authorization") String jwt
+    ) throws Exception {
+        List<MedicineDto> medicines = medicineService.getInStockMedicines(jwt);
+        return ResponseEntity.ok(new ApiResponse("Success", medicines));
+    }
+
+    @GetMapping("/outta-stock")
+    public ResponseEntity<ApiResponse> getOuttaStockMedicines(
+            @RequestHeader("Authorization") String jwt
+    ) throws Exception {
+        List<MedicineDto> medicines = medicineService.getOutStockMedicines(jwt);
+        return ResponseEntity.ok(new ApiResponse("Success", medicines));
+    }
+
+    @GetMapping("/low")
+    public ResponseEntity<ApiResponse> getLowMedicinesHandler(
+            @RequestHeader("Authorization") String jwt
+    ) throws Exception {
+        List<MedicineDto> medicines = medicineService.getLowStockMedicines(jwt);
+        return ResponseEntity.ok(new ApiResponse("Success", medicines));
+    }
 }

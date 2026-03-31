@@ -14,6 +14,7 @@ import com.atechproc.request.category.UpdateCategoryName;
 import com.atechproc.service.business.IBusinessLogicService;
 import com.atechproc.service.pharmacy.IPharmacyService;
 import com.atechproc.service.user.IUserService;
+import com.atechproc.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class CategoryService implements ICategoryService {
     private final CategoryRepository categoryRepository;
     private final IPharmacyService pharmacyService;
     private final IBusinessLogicService businessLogicService;
-    private final IUserService userService;
+    private final Utils utils;
 
     @Override
     public Category getCategoryById(Long id) {
@@ -42,20 +43,7 @@ public class CategoryService implements ICategoryService {
     @PreAuthorize("hasAnyRole('PHARMACY_OWNER', 'PHARMACIST')")
     public CategoryDto createCategory(CreateCategoryRequest request, String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         Category category = categoryRepository.findByNameAndPharmacy_id(request.getName(), pharmacy.getId());
 
@@ -76,20 +64,7 @@ public class CategoryService implements ICategoryService {
     @PreAuthorize("hasAnyRole('PHARMACY_OWNER', 'PHARMACIST')")
     public CategoryDto updateCategory(UpdateCategoryName request, Long id, String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         Category category = getCategoryById(id);
 
@@ -116,20 +91,7 @@ public class CategoryService implements ICategoryService {
     @PreAuthorize("hasAnyRole('PHARMACY_OWNER', 'PHARMACIST')")
     public void deleteCategory(Long id, String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         Category category = getCategoryById(id);
 
@@ -143,20 +105,7 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public List<CategoryDto> searchForCategory(String keyword, String jwt) throws Exception {
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         List<Category> categories = categoryRepository.searchForCategory(keyword, pharmacy.getId());
         return CategoryMapper.toDTOs(categories, businessLogicService);

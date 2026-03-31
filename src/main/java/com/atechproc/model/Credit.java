@@ -33,6 +33,9 @@ public class Credit {
     @Column(nullable = false)
     private BigDecimal remainingAmount;
 
+    @Column(nullable = false)
+    private String phone;
+
     private CREDIT_STATUS status = CREDIT_STATUS.PENDING;
 
     @ManyToOne

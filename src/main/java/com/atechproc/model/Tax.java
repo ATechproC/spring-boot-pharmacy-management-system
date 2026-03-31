@@ -1,6 +1,8 @@
 package com.atechproc.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,24 +19,26 @@ import java.time.YearMonth;
 @Entity
 @Table(name = "taxes")
 public class Tax {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotEmpty(message = "Tax name is required")
     private String name;
-
-    private String description;
-
-    private BigDecimal total;
 
     @ManyToOne
     @JoinColumn(name = "pharmacy_id")
     private Pharmacy pharmacy;
 
-    private boolean isActive = true;
+    private String description;
 
+    @NotNull(message = "Tax total is required")
+    private BigDecimal total;
+
+    @Column(name = "year_month_value")
     private String yearMonth = YearMonth.now().toString();
 
     private int year = LocalDate.now().getYear();
+
 }

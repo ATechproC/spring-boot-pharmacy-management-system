@@ -14,6 +14,7 @@ import com.atechproc.service.cart.ICartService;
 import com.atechproc.service.medicine.IMedicineService;
 import com.atechproc.service.pharmacy.IPharmacyService;
 import com.atechproc.service.user.IUserService;
+import com.atechproc.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,24 +33,13 @@ public class OrderService implements IOrderService {
     private final ICartService cartService;
     private final MedicineRepository medicineRepository;
     private final IMedicineService medicineService;
+    private final Utils utils;
     private final IUserService userService;
 
     @Override
     public OrderDto createOrder(String jwt) throws Exception {
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
 
         Cart cart = pharmacy.getCart();
 
@@ -99,20 +89,7 @@ public class OrderService implements IOrderService {
 
     @Override
     public OrderDto getOrder(Long orderId, String jwt) throws Exception {
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         Order order = getOrderById(orderId);
         if (!pharmacy.getOrders().contains(order)) {
@@ -136,20 +113,7 @@ public class OrderService implements IOrderService {
     @Override
     public List<Order> getTodayOrders(String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         return orderRepository.findByPharmacy_idAndDate(
                 pharmacy.getId(),
                 LocalDate.now());
@@ -158,60 +122,21 @@ public class OrderService implements IOrderService {
     @Override
     public List<Order> getThisMonthOrders(String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         return orderRepository.findByPharmacy_idAndYearMonth(pharmacy.getId(), YearMonth.now().toString());
     }
 
     @Override
     public List<Order> getThisYearOrders(String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         return orderRepository.findByPharmacy_idAndYear(pharmacy.getId(), LocalDate.now().getYear());
     }
 
     @Override
     public List<Order> getThisWeekOrders(String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         int currentWeekOfMonth = LocalDate.now().get(WeekFields.ISO.weekOfMonth());
         return orderRepository.findByPharmacy_idAndWeekOfMonthAndYearMonth(
                 pharmacy.getId(),
@@ -222,20 +147,7 @@ public class OrderService implements IOrderService {
     @Override
     public List<Order> getDayOrders(String jwt, LocalDate date) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         return orderRepository.findByPharmacy_idAndDate(
                 pharmacy.getId(),
                 date);
@@ -244,60 +156,21 @@ public class OrderService implements IOrderService {
     @Override
     public List<Order> getMonthOrders(String jwt, YearMonth yearMonth) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         return orderRepository.findByPharmacy_idAndYearMonth(pharmacy.getId(), yearMonth.toString());
     }
 
     @Override
     public List<Order> getYearOrders(String jwt, int year) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         return orderRepository.findByPharmacy_idAndYear(pharmacy.getId(), year);
     }
 
     @Override
     public List<Order> getWeekOfMonthOrders(String jwt, int weekOfMonth, YearMonth yearMonth) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         return orderRepository.findByPharmacy_idAndWeekOfMonthAndYearMonth(pharmacy.getId(), weekOfMonth,
                 yearMonth.toString());
     }
@@ -305,20 +178,7 @@ public class OrderService implements IOrderService {
     @Override
     public List<Order> getAllOrders(String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         return orderRepository.findByPharmacy_id(pharmacy.getId());
     }
 
@@ -335,20 +195,7 @@ public class OrderService implements IOrderService {
     @Override
     public List<OrderItemDto> getLastOrderItems(String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         List<OrderItem> items = orderItemRepository.searchLastOrderItems(pharmacy.getId(), LocalDate.now());
         return OrderMapper.toOrderItemDTOs(items);
     }

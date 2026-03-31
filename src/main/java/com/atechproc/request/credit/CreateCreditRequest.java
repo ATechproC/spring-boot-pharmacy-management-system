@@ -19,4 +19,7 @@ public class CreateCreditRequest {
 
     @NotNull(message = "Credit paid amount")
     private BigDecimal paidAmount;
+
+    @NotEmpty(message = "Phone number is required")
+    private String phone;
 }

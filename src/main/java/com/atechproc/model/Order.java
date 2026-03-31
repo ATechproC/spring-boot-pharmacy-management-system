@@ -36,7 +36,7 @@ public class Order {
     @JoinColumn(name = "pharmacy_id")
     private Pharmacy pharmacy;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "pharmacist_id")
     private User pharmacist;
 

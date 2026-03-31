@@ -12,4 +12,5 @@ public class InventoryDetails {
     private Long medicinesOutOfStock;
     private Long totalNumberOfMedicines;
     private Long totalOfCredits;
+    private Long totalOfTaxes;
 }

@@ -20,4 +20,6 @@ public interface IPharmacyService {
     List<PharmacyDto> getAllPharmacies();
 
     Pharmacy getPharmacyByUser(String jwt);
+
+    Pharmacy getPharmacyByUserId(Long id);
 }

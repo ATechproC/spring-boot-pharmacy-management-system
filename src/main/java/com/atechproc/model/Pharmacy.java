@@ -45,10 +45,11 @@ public class Pharmacy {
     private List<Category> categories = new ArrayList<>();
 
     @OneToMany(mappedBy = "pharmacy", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Tax> taxes = new ArrayList<>();
+    private List<Credit> credits = new ArrayList<>();
 
     @OneToMany(mappedBy = "pharmacy", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Credit> credits = new ArrayList<>();
+    private List<Tax> taxes = new ArrayList<>();
+
 
     @OneToOne(cascade = CascadeType.ALL)
     private Cart cart;

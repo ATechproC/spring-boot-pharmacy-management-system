@@ -88,15 +88,12 @@ public class Medicine {
     public MEDICINE_STATUS updateStatus() {
         if(expiredDate != null && expiredDate.isBefore(YearMonth.now())) {
             status = MEDICINE_STATUS.EXPIRED;
-        }
+        } else status = MEDICINE_STATUS.AVAILABLE;
         return status;
     }
 
     public boolean updateLowVerification() {
-        if(quantity < 5) {
-            low = true;
-        }
-        return low;
+        return quantity <= 5;
     }
 
     public boolean verifyIsInStock() {

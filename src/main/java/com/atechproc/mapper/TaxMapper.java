@@ -11,6 +11,7 @@ public class TaxMapper {
         dto.setId(tax.getId());
         dto.setName(tax.getName());
         dto.setDescription(tax.getDescription());
+        dto.setTotal(tax.getTotal());
         return dto;
     }
 

@@ -19,6 +19,7 @@ public class InventoryService implements IInventoryService {
     private final CreditRepository creditRepository;
     private final UserRepository userRepository;
     private final IPharmacyService pharmacyService;
+    private final TaxRepository taxRepository;
 
     @Override
     public InventoryDetails getInventoryDetails(String jwt) {
@@ -32,6 +33,7 @@ public class InventoryService implements IInventoryService {
         Long medicinesOutOfStock = medicineRepository.countByInStockAndPharmacy_idAndActive(false, pharmacy.getId(), true);
         Long totalNumberOfMedicines = medicineRepository.countByPharmacy_idAndActive(pharmacy.getId(), true);
         Long totalOfCredits = creditRepository.countByPharmacy_id(pharmacy.getId());
+        Long totalOfTaxes = taxRepository.countByPharmacy_id(pharmacy.getId());
 
         InventoryDetails details = new InventoryDetails();
         details.setAvailableMedicines(availableMedicines);
@@ -42,6 +44,7 @@ public class InventoryService implements IInventoryService {
         details.setMedicinesOutOfStock(medicinesOutOfStock);
         details.setTotalNumberOfMedicines(totalNumberOfMedicines);
         details.setTotalOfCredits(totalOfCredits);
+        details.setTotalOfTaxes(totalOfTaxes);
 
         return details;
     }

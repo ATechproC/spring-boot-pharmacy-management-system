@@ -18,6 +18,7 @@ import com.atechproc.request.pharmacy.UpdatePharmacyRequest;
 import com.atechproc.service.business.IBusinessLogicService;
 import com.atechproc.service.medicine.IMedicineService;
 import com.atechproc.service.user.IUserService;
+import com.atechproc.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -99,20 +100,8 @@ public class PharmacyService implements IPharmacyService {
     @PreAuthorize("hasRole('PHARMACY_OWNER')")
     public PharmacyDto updatePharmacyByOwner(UpdatePharmacyRequest request, String jwt) throws Exception {
 
-        Pharmacy pharmacy = getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
+        Pharmacy pharmacy = checkPharmacyAndUserStatus(jwt);
         User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
 
         Pharmacy existingPharmacy = pharmacyRepository.findByOwner_id(user.getId());
 
@@ -155,11 +144,6 @@ public class PharmacyService implements IPharmacyService {
     @PreAuthorize("hasAnyRole('PHARMACY_OWNER')")
     public PharmacyDto updatePharmacyStatus(String jwt) throws Exception {
 
-        Pharmacy pharmacy = getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
         User user = userService.getUserProfile(jwt);
 
         if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
@@ -192,10 +176,39 @@ public class PharmacyService implements IPharmacyService {
     @Override
     public Pharmacy getPharmacyByUser(String jwt) {
         User user = userService.getUserProfile(jwt);
+        System.out.println("################ "+user.getEmail());
         if (user.getRole().equals(USER_ROLE.PHARMACIST)) {
             return user.getPharmacy();
         }
         return pharmacyRepository.findByOwner_id(user.getId());
+    }
+
+    @Override
+    public Pharmacy getPharmacyByUserId(Long id) {
+        Pharmacy pharmacy = pharmacyRepository.findByOwner_id(id);
+        if(pharmacy == null) {
+            throw new ResourceNotFoundException("Pharmacy not found with user id "+id);
+        }
+        return pharmacy;
+    }
+
+    public Pharmacy checkPharmacyAndUserStatus(String jwt) throws Exception {
+        Pharmacy pharmacy = getPharmacyByUser(jwt);
+
+        if (!pharmacy.isOpen()) {
+            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
+        }
+        User user = userService.getUserProfile(jwt);
+
+        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
+            throw new Exception("You cant achieve this actions because your account is REFUSED");
+        }
+
+        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
+            throw new Exception("You cant achieve this actions because your account is PENDING");
+        }
+
+        return pharmacy;
     }
 
 }

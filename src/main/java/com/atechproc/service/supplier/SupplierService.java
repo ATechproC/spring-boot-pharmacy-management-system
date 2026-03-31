@@ -19,6 +19,7 @@ import com.atechproc.service.business.IBusinessLogicService;
 import com.atechproc.service.medicine.IMedicineService;
 import com.atechproc.service.pharmacy.IPharmacyService;
 import com.atechproc.service.user.IUserService;
+import com.atechproc.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class SupplierService implements ISupplierService {
     private final SupplierRepository supplierRepository;
     private final IPharmacyService pharmacyService;
     private final IBusinessLogicService businessLogicService;
-    private final IUserService userService;
+    private final Utils utils;
 
     @Override
     public Supplier getSupplierById(Long id) {
@@ -47,21 +48,7 @@ public class SupplierService implements ISupplierService {
     @PreAuthorize("hasAnyRole('PHARMACY_OWNER', 'PHARMACIST')")
     public SupplierDto createSupplier(CreateSupplierRequest request, String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
-
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         Supplier supplier = supplierRepository.findByNameAndPharmacy_id(request.getName(), pharmacy.getId());
 
@@ -83,20 +70,7 @@ public class SupplierService implements ISupplierService {
     public SupplierDto updateSupplier(UpdateSupplierRequest request, Long id, String jwt)
             throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         Supplier supplier = getSupplierById(id);
         if (!pharmacy.getSuppliers().contains(supplier)) {
@@ -115,20 +89,7 @@ public class SupplierService implements ISupplierService {
     @Override
     public List<SupplierDto> getAllSuppliers(String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         List<Supplier> suppliers = supplierRepository.findByPharmacy_idAndActive(pharmacy.getId(), true);
         return SupplierMapper.toDTOs(suppliers, businessLogicService);
     }
@@ -137,20 +98,7 @@ public class SupplierService implements ISupplierService {
     @PreAuthorize("hasAnyRole('PHARMACY_OWNER', 'PHARMACIST')")
     public void deleteSupplier(Long id, String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
 
         Supplier supplier = getSupplierById(id);
         if (!pharmacy.getSuppliers().contains(supplier)) {
@@ -164,20 +112,7 @@ public class SupplierService implements ISupplierService {
     @Override
     public List<SupplierDto> searchForSupplier(String keyword, String jwt) throws Exception {
 
-        Pharmacy pharmacy = pharmacyService.getPharmacyByUser(jwt);
-
-        if (!pharmacy.isOpen()) {
-            throw new Exception("You can't achieve this actions because the pharmacy is closed for the moments");
-        }
-        User user = userService.getUserProfile(jwt);
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.REFUSED)) {
-            throw new Exception("You cant achieve this actions because your account is REFUSED");
-        }
-
-        if (user.getStatus().equals(ACCOUNT_STATUS.PENDING)) {
-            throw new Exception("You cant achieve this actions because your account is PENDING");
-        }
+        Pharmacy pharmacy = utils.checkPharmacyAndUserStatus(jwt);
         List<Supplier> suppliers = supplierRepository.searchForSupplier(keyword, pharmacy.getId());
         return SupplierMapper.toDTOs(suppliers, businessLogicService);
     }

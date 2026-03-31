@@ -28,10 +28,6 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
             " and m.pharmacy.id=:id and m.status='AVAILABLE' and m.active=true")
     List<Medicine> searchForMedicineByBatchNumber(@Param("keyword") String keyword, @Param("id") Long id);
 
-
-//    @Query("select m from Medicine m where pharmacy.id=:id order by m.soldQuantity desc limit 6")
-//    List<Medicine> topSellingMedicines(@Param("id") Long id);
-
     @Query("select m from Medicine m where m.category.id=:groupId and lower(m.name) like concat('%', :keyword, '%') and pharmacy.id=:pharmacyId and m.active=true")
     List<Medicine> searchForMedicineByGroupAndName(@Param("pharmacyId") Long id,@Param("groupId") Long groupId, String keyword);
 
@@ -95,4 +91,11 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
 
     @Query("select m from Medicine m inner join OrderItem o on m.id=o.medicine.id where m.pharmacy.id=:pharmacyId and o.order.weekOfMonth=:weekOfMonth and o.order.yearMonth=:yearMonth order by o.quantity desc limit 6")
     List<Medicine> getWeekTopSellingMedicines(@Param("pharmacyId") Long id, int weekOfMonth,@Param("yearMonth") String yearMonth);
+
+    @Query("select m from Medicine m where m.pharmacy.id=:id and m.active=true and lower(m.name) like concat('%', lower(:name), '%') and lower(m.batchNumber) like concat('%', lower(:batchNumber), '%')")
+    List<Medicine> searchByNameAndBatchNumber(Long id, String name, String batchNumber);
+
+    List<Medicine> findByPharmacy_idAndInStockAndActive(Long id, boolean b, boolean b1);
+
+    List<Medicine> findByPharmacy_idAndLowAndActive(Long id, boolean b, boolean b1);
 }

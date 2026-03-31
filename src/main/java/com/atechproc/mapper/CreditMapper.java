@@ -15,6 +15,7 @@ public class CreditMapper {
         dto.setPaidAmount(credit.getPaidAmount());
         dto.setRemainingAmount(credit.getRemainingAmount());
         dto.setStatus(credit.getStatus());
+        dto.setPhone(credit.getPhone());
         return dto;
     }
 

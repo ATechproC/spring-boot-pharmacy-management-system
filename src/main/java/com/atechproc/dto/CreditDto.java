@@ -14,4 +14,5 @@ public class CreditDto {
     private BigDecimal paidAmount;
     private BigDecimal remainingAmount;
     private CREDIT_STATUS status;
+    private String phone;
 }

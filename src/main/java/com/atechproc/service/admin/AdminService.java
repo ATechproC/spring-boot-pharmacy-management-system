@@ -12,6 +12,7 @@ import com.atechproc.repository.UserRepository;
 import com.atechproc.request.auth.SignupRequest;
 import com.atechproc.response.AuthResponse;
 import com.atechproc.security.jwt.JwtProvider;
+import com.atechproc.service.pharmacy.IPharmacyService;
 import com.atechproc.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,6 +43,7 @@ public class AdminService implements IAdminService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final IPharmacyService pharmacyService;
 
     @Override
     public AuthResponse adminSignup() {
@@ -80,7 +82,7 @@ public class AdminService implements IAdminService {
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
-    public UserDto deactivateActivateUserAccount(Long userId, String jwt, ACCOUNT_STATUS status) throws Exception {
+    public UserDto deactivateActivateUserAccount(Long ownerId, String jwt, ACCOUNT_STATUS status) throws Exception {
 
         User admin = userService.getUserProfile(jwt);
 
@@ -92,14 +94,20 @@ public class AdminService implements IAdminService {
             throw new Exception("You cant achieve this actions because your account is PENDING");
         }
 
-        User user = userService.getUserById(userId);
+        User owner = userService.getUserById(ownerId);
 
-        if(user.getRole().equals(USER_ROLE.ADMIN)) {
+        if(owner.getRole().equals(USER_ROLE.ADMIN)) {
             throw new Exception("You cannot update this user's account status");
         }
 
-        user.setStatus(status);
-        User savedUser = userService.saveUser(user);
+//        Pharmacy pharmacy = pharmacyService.getPharmacyByUserId(owner.getId());
+//
+//        if(status.equals(ACCOUNT_STATUS.ACCEPTED)) {
+//            pharmacy.setOpen(true);
+//        }else pharmacy.setOpen(false);
+
+        owner.setStatus(status);
+        User savedUser = userService.saveUser(owner);
         return UserMapper.toDto(savedUser);
     }
 

@@ -40,4 +40,8 @@ public interface IMedicineService {
     List<MedicineDto> searchForMedicinesByGroupAndMedicineName(String jwt, Long groupId, String keyword) throws Exception;
     List<MedicineDto> searchForMedicinesBySupplierAndMedicineName(String jwt, Long supplierId, String keyword) throws Exception;
     List<MedicineDto> searchForExpiredMedicinesByName(String jwt, String keyword) throws Exception;
+    List<MedicineDto> searchForMedicinesByNameAndBatchNumber(String jwt, String name, String batchNumber) throws Exception;
+    List<MedicineDto> getInStockMedicines(String jwt) throws Exception;
+    List<MedicineDto> getLowStockMedicines(String jwt) throws Exception;
+    List<MedicineDto> getOutStockMedicines(String jwt) throws Exception;
 }
